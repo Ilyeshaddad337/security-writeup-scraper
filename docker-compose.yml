@@ -1,0 +1,38 @@
+services:
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: hmas_chromadb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8888:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=false
+      - ALLOW_RESET=true
+
+  # scraper:
+  #   image: python:3.12-slim
+  #   container_name: hmas_scraper
+  #   depends_on:
+  #     - chromadb
+  #   volumes:
+  #     - ./:/app
+  #     - scraper_output:/app/output
+  #     - exploitdb_cache:/tmp/exploitdb
+  #   working_dir: /app
+  #   environment:
+  #     - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+  #     - NVD_API_KEY=${NVD_API_KEY:-}
+  #     - PYTHONUNBUFFERED=1
+  #   command: >
+  #     sh -c "apt-get update -q && apt-get install -y -q git &&
+  #            pip install -r requirements.txt -q &&
+  #            python scraper.py ${SCRAPER_ARGS:---only cve} &&
+  #            python ingest.py --chroma-host chromadb --chroma-port 8000"
+
+volumes:
+  chroma_data:
+  scraper_output:
+  exploitdb_cache:
